@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { createBackEndClient } from "@/app/utils/supabase/server";
 
-export async function signup(formData: FormData) {
+export default async function signup(formData: FormData) {
   const supabase = createBackEndClient();
 
   // type-casting here for convenience
