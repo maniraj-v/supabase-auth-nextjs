@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/Navbar";
+import Navbar from "../components/Navbar";
+import { Toaster } from "@/components/ui/toaster";
 
 const fontSans = Poppins({
   weight: ["100", "300", "400", "500", "600"],
@@ -22,9 +23,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${fontSans.variable} antialiased min-h-screen px-4 flex flex-col`}>
+      <body
+        className={`${fontSans.variable} antialiased min-h-screen px-4 flex flex-col`}
+      >
         <Navbar />
-        {children}
+        <main className="flex-grow flex justify-center items-center">
+          {children}
+        </main>
+        <Toaster />
       </body>
     </html>
   );

@@ -1,28 +1,29 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-
 import { createBackEndClient } from "@/app/utils/supabase/server";
 
-export default async function signup(formData: FormData) {
+export default async function signup(data: any) {
   const supabase = createBackEndClient();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  const signupResponse = await supabase.auth.signUp(data);
+  console.log(signupResponse);
 
-  console.log({ data });
-  const { error } = await supabase.auth.signUp(data);
-  console.log({ error });
-
-  if (error) {
-    redirect("/error");
+  if (signupResponse.error) {
+    return { isError: true, message: "Error Registering User" };
   }
 
-  revalidatePath("/", "layout");
-  redirect("/");
+  // Insert users table
+  const usersData = {
+    id: signupResponse.data.user?.id,
+    email: data.email,
+    first_name: data.firstName,
+    last_name: data.lastName,
+  };
+  const insertUserResponse = await supabase.from("users").insert([usersData]);
+  console.log(insertUserResponse);
+
+  if (insertUserResponse.error) {
+    return { isError: true, message: "Error Registering User" };
+  }
+  return { isError: false, message: "Registration Successful" };
 }

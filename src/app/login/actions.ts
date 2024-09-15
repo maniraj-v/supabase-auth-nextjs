@@ -1,26 +1,18 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-
 import { createBackEndClient } from "@/app/utils/supabase/server";
 
-export default async function login(formData: FormData) {
+export default async function login(data: any) {
   const supabase = createBackEndClient();
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-  };
+  const signInResponse = await supabase.auth.signInWithPassword(data);
 
-  const { error } = await supabase.auth.signInWithPassword(data);
-
-  if (error) {
-    redirect("/error");
+  if (signInResponse.error) {
+    return {
+      isError: true,
+      message: "Login Failed. Please check credentials!",
+    };
   }
 
-  revalidatePath("/", "layout");
-  redirect("/");
+  return { isError: false, message: "Login Successful" };
 }
